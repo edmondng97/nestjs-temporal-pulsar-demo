@@ -1,0 +1,18 @@
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, "Segoe UI", system-ui, sans-serif; color: #1c2128; background: #f6f8fa; }
+header { padding: 24px 32px; background: #0d1117; color: #fff; }
+header h1 { margin: 0 0 8px; font-size: 22px; }
+header p { margin: 0; color: #9da7b3; font-size: 14px; }
+.flow { display: flex; gap: 12px; align-items: center; padding: 32px; overflow-x: auto; }
+.node { flex: 0 0 auto; min-width: 170px; padding: 14px 16px; background: #fff; border: 2px solid #d0d7de; border-radius: 10px; cursor: pointer; transition: .15s; }
+.node:hover { border-color: #0969da; transform: translateY(-2px); }
+.node.active { border-color: #0969da; box-shadow: 0 0 0 3px rgba(9,105,218,.2); }
+.node h4 { margin: 0; font-size: 14px; }
+.arrow { color: #57606a; font-size: 20px; }
+.statemachine { padding: 0 32px 24px; }
+.states { display: flex; gap: 8px; flex-wrap: wrap; }
+.state { padding: 8px 14px; border-radius: 20px; background: #fff; border: 1px solid #d0d7de; font-size: 13px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+.detail { margin: 0 32px 40px; padding: 20px 24px; background: #fff; border: 1px solid #d0d7de; border-radius: 10px; }
+.detail h3 { margin: 16px 0 4px; font-size: 13px; color: #0969da; text-transform: uppercase; letter-spacing: .04em; }
+.detail pre { background: #0d1117; color: #e6edf3; padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; }

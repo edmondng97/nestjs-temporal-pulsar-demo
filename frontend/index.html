@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Campaign Dispatch 架构讲解</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Campaign + Temporal + Pulsar 派发架构</h1>
+    <p>点击任一节点查看「做什么 / 为什么这样设计 / 对应代码」。纯静态，无后端调用。</p>
+  </header>
+
+  <section id="flow" class="flow"><!-- nodes injected by app.js --></section>
+
+  <section class="statemachine">
+    <h2>Delivery 状态机（CAS 流转）</h2>
+    <div id="states" class="states"></div>
+  </section>
+
+  <aside id="detail" class="detail">
+    <h2 id="detail-title">点击上方节点</h2>
+    <h3>做什么</h3><p id="detail-what"></p>
+    <h3>为什么这样设计</h3><p id="detail-why"></p>
+    <h3>对应代码</h3><pre><code id="detail-code"></code></pre>
+  </aside>
+
+  <script src="snippets.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
