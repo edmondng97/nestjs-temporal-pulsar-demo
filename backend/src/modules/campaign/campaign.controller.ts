@@ -44,12 +44,17 @@ export class CampaignController {
     return { paused: true };
   }
 
-  // Resume = clear pause flag + bump epoch. Old in-flight messages become stale
-  // and are fenced at the consumer; un-sent PENDING rows get re-dispatched.
+  // Resume = clear pause flag + bump epoch + rewind. Bumping the epoch makes old
+  // in-flight messages stale (fenced at the consumer). Rewinding IN_PROGRESS rows
+  // back to PENDING re-queues exactly those rows whose old-epoch messages were
+  // fenced, so the fresh dispatch round re-sends them under the new epoch and the
+  // campaign can drain to completion.
   @Post(':id/resume')
   async resume(@Param('id') id: string) {
+    const oid = new Types.ObjectId(id);
     await this.redis.setPaused(id, false);
-    const epoch = await this.campaignService.bumpEpoch(new Types.ObjectId(id));
+    const epoch = await this.campaignService.bumpEpoch(oid);
+    await this.deliveryService.rewindInProgressToPending(oid);
     await this.temporal.client.start(EXECUTE_CAMPAIGN_WORKFLOW_TYPE, {
       taskQueue: SCHEDULER_TASK_QUEUE,
       workflowId: `${buildExecuteWorkflowId(id)}-resume-${epoch}`,

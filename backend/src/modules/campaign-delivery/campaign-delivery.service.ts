@@ -68,4 +68,24 @@ export class CampaignDeliveryService implements ICampaignDeliveryDispatchPort {
   async countByStatus(campaignId: Types.ObjectId, status: string): Promise<number> {
     return this.model.countDocuments({ campaignId, status });
   }
+
+  // Idempotency guard for targeting: a re-run of the parent workflow (e.g. resume)
+  // must not materialise a second batch of deliveries.
+  async existsForCampaign(campaignId: Types.ObjectId): Promise<boolean> {
+    return (await this.model.exists({ campaignId })) !== null;
+  }
+
+  // Rewind on resume: rows left IN_PROGRESS were marked-and-sent under the old
+  // epoch, so their in-flight messages are now fenced out at the consumer and
+  // would otherwise be stranded (the dispatcher only re-reads PENDING). Reset
+  // them to PENDING so the new dispatch round re-sends them under the new epoch.
+  // SENDING rows are deliberately left alone — a consumer already claimed them
+  // and will drive them to a terminal status.
+  async rewindInProgressToPending(campaignId: Types.ObjectId): Promise<number> {
+    const r = await this.model.updateMany(
+      { campaignId, status: DELIVERY_STATUS.IN_PROGRESS },
+      { $set: { status: DELIVERY_STATUS.PENDING } },
+    );
+    return r.modifiedCount;
+  }
 }

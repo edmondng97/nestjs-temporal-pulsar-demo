@@ -5,8 +5,11 @@ import Redis from 'ioredis';
 export class RedisService {
   private readonly client: Redis;
 
-  constructor(url = process.env.REDIS_URL ?? 'redis://localhost:6379') {
-    this.client = new Redis(url);
+  // Parameterless so Nest can construct it via DI. A constructor parameter (even
+  // with a default) makes Nest try to resolve it as a provider and fail at boot;
+  // the connection URL is environment config, not an injectable dependency.
+  constructor() {
+    this.client = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379');
   }
 
   private pauseKey(campaignId: string): string {

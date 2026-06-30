@@ -5,7 +5,7 @@ jest.mock('ioredis', () => require('ioredis-mock'));
 
 describe('RedisService pause flag', () => {
   let svc: RedisService;
-  beforeAll(() => { svc = new RedisService('redis://localhost:6379'); });
+  beforeAll(() => { svc = new RedisService(); });
 
   it('defaults to not paused', async () => {
     expect(await svc.isPaused('c1')).toBe(false);
