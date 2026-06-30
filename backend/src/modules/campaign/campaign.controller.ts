@@ -33,7 +33,8 @@ export class CampaignController {
     await this.temporal.client.start(EXECUTE_CAMPAIGN_WORKFLOW_TYPE, {
       taskQueue: SCHEDULER_TASK_QUEUE,
       workflowId: buildExecuteWorkflowId(id),
-      args: [{ campaignId: id, dispatcherTaskQueue: DISPATCHER_TASK_QUEUE }],
+      // Fresh campaign starts at epoch 0; child dispatcher id is epoch-scoped.
+      args: [{ campaignId: id, dispatcherTaskQueue: DISPATCHER_TASK_QUEUE, epoch: 0 }],
     });
     return { started: true };
   }
@@ -58,7 +59,9 @@ export class CampaignController {
     await this.temporal.client.start(EXECUTE_CAMPAIGN_WORKFLOW_TYPE, {
       taskQueue: SCHEDULER_TASK_QUEUE,
       workflowId: `${buildExecuteWorkflowId(id)}-resume-${epoch}`,
-      args: [{ campaignId: id, dispatcherTaskQueue: DISPATCHER_TASK_QUEUE }],
+      // Pass the bumped epoch so the child dispatcher id is dispatch-<id>-<epoch>,
+      // never colliding with a previous round's still-exiting dispatcher.
+      args: [{ campaignId: id, dispatcherTaskQueue: DISPATCHER_TASK_QUEUE, epoch }],
     });
     return { resumed: true, epoch };
   }

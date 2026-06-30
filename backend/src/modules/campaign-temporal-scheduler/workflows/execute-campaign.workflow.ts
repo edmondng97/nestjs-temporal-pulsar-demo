@@ -17,16 +17,16 @@ const { targeting } = proxyActivities<Targeting_Activity_Interface>({
 export async function executeCampaignWorkflow(
   input: ExecuteCampaignWorkflow_Input_Interface,
 ): Promise<void> {
-  const { campaignId, dispatcherTaskQueue } = input;
+  const { campaignId, dispatcherTaskQueue, epoch } = input;
 
   await targeting({ campaignId });
 
   await startChild(CAMPAIGN_DISPATCHER_WORKFLOW_TYPE, {
-    workflowId: buildDispatcherWorkflowId(campaignId),
+    workflowId: buildDispatcherWorkflowId(campaignId, epoch),
     taskQueue: dispatcherTaskQueue,
     // ABANDON: parent completes immediately; without it the default TERMINATE
     // policy would kill the still-running dispatcher when the parent closes.
     parentClosePolicy: ParentClosePolicy.ABANDON,
-    args: [{ campaignId, epoch: 0, dispatchChunk: 500, dispatcherConcurrency: 100 }],
+    args: [{ campaignId, epoch, dispatchChunk: 500, dispatcherConcurrency: 100 }],
   });
 }

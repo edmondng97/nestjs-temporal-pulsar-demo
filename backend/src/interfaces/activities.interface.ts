@@ -14,6 +14,9 @@ export interface DispatchPlayers_Activity_Interface {
 export interface ExecuteCampaignWorkflow_Input_Interface {
   campaignId: string;
   dispatcherTaskQueue: string;
+  // Dispatch generation. Used to build a per-round child workflowId so a
+  // resume's dispatcher never collides with a still-exiting previous one.
+  epoch: number;
 }
 
 export interface CampaignDispatcherWorkflow_Input_Interface {
