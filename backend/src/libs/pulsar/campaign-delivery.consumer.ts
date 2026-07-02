@@ -10,6 +10,7 @@ import {
 import { CampaignDeliveryService } from '../../modules/campaign-delivery/campaign-delivery.service';
 import { CampaignService } from '../../modules/campaign/campaign.service';
 import { DELIVERY_STATUS } from '../../constants';
+import { CampaignEventsService } from '../events/campaign-events.service';
 
 @Injectable()
 export class CampaignDeliveryConsumer {
@@ -19,6 +20,7 @@ export class CampaignDeliveryConsumer {
     @Inject(CAMPAIGN_DELIVERY_PULSAR_CLIENT) private readonly client: Client,
     private readonly deliveryService: CampaignDeliveryService,
     private readonly campaignService: CampaignService,
+    private readonly events: CampaignEventsService,
   ) {}
 
   // Shared subscription → many consumers can drain the same backlog in parallel.
@@ -60,7 +62,16 @@ export class CampaignDeliveryConsumer {
 
     // Step 0.5: epoch fence. A stale (pre-resume) message must not touch the row.
     const currentEpoch = await this.campaignService.getDispatchEpoch(campaignId);
-    if (data.epoch < currentEpoch) return; // ack-skip, row untouched
+    if (data.epoch < currentEpoch) {
+      this.events.emit({
+        campaignId: campaignId.toString(),
+        deliveryId: data.deliveryId,
+        outcome: 'REJECTED_STALE',
+        epoch: data.epoch,
+        ts: new Date().toISOString(),
+      });
+      return; // ack-skip, row untouched
+    }
 
     // Step 1: CAS IN_PROGRESS → SENDING. Concurrent loser → ack-skip.
     const cas = await this.deliveryService.markSendingIfInProgress(deliveryId);
@@ -70,11 +81,19 @@ export class CampaignDeliveryConsumer {
     const ok = await this.deliverStub();
 
     // Step 3: finalize terminal status.
+    const status = ok ? DELIVERY_STATUS.SUCCESS : DELIVERY_STATUS.FAILED;
     await this.deliveryService.markTerminal({
       deliveryId,
-      status: ok ? DELIVERY_STATUS.SUCCESS : DELIVERY_STATUS.FAILED,
+      status,
       completedAt: new Date(),
       ...(ok ? {} : { errorMessage: 'stub_random_failure' }),
+    });
+    this.events.emit({
+      campaignId: campaignId.toString(),
+      deliveryId: data.deliveryId,
+      outcome: ok ? 'SUCCESS' : 'FAILED',
+      epoch: data.epoch,
+      ts: new Date().toISOString(),
     });
   }
 
