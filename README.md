@@ -3,9 +3,10 @@
 面试用技术架构 demo。从生产服务抽取 **Campaign 派发核心链路**，剥离全部业务逻辑（投递动作=空 stub），
 聚焦展示：**Temporal 工作流编排、Pulsar 消息派发、基于 CAS 的状态机幂等、epoch 防陈旧消息栅栏、暂停/恢复 rewind、对账兜底、六边形端口分层、代码规范**。
 
-分两部分：
+三个部分：
 - `backend/` — 真实可运行的 NestJS 服务（连真实 Temporal / Pulsar / Mongo / Redis）
-- `frontend/` — 纯静态单页交互架构图（不接 API，只解说）
+- `frontend/` — Vite + React 运行时控制台（列表、派发/暂停/恢复、SSE 实时事件流）
+- `demo/` — 静态 keynote 风格演示文稿，打开 `demo/index.html`，用 ←/→ 翻页
 
 ---
 
@@ -38,6 +39,23 @@ POST /campaigns/:id/dispatch
 Delivery 状态机：`PENDING → IN_PROGRESS → SENDING → SUCCESS / FAILED`（全部走原子 CAS）。
 
 ---
+
+## Repository layout
+
+| Part | Path | What it is |
+|---|---|---|
+| Backend | `backend/` | NestJS + Temporal + Pulsar campaign dispatch engine |
+| Console | `frontend/` | Vite + React runtime console (list, dispatch/pause/resume, live SSE event stream) |
+| Demo | `demo/` | Static keynote-style presentation — open `demo/index.html`, navigate with ←/→ |
+
+## Quick start
+
+```bash
+docker compose up -d
+cd backend && npm i && npm run build && node dist/main.js
+# new terminal
+cd frontend && npm i && npm run dev    # console on http://localhost:5173
+```
 
 ## 运行后端
 
@@ -83,15 +101,13 @@ cd backend && npm test     # 3 套，7 用例：CAS 状态机 / Redis pause / re
 
 ---
 
-## 运行前端
-
-纯静态，无需服务器：
+## 运行前端控制台
 
 ```bash
-open frontend/index.html
+cd frontend && npm i && npm run dev    # http://localhost:5173
 ```
 
-点击链路节点查看每一步「做什么 / 为什么这样设计 / 对应代码」。零网络请求。
+实时 SSE 事件流、暂停/恢复操作、派发进度一览。
 
 ---
 
