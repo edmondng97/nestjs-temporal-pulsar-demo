@@ -3,6 +3,7 @@ import './theme.css';
 import { listCampaigns } from './api';
 import { usePolling } from './usePolling';
 import { CampaignList } from './CampaignList';
+import { CampaignDetail } from './CampaignDetail';
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -26,7 +27,7 @@ export default function App() {
           onSelect={setSelectedId} onError={setErrorBar} />
         <main style={{ flex: 1, padding: 16 }}>
           {selectedId
-            ? <p style={{ color: 'var(--muted)' }}>Detail panel arrives in the next task.</p>
+            ? <CampaignDetail id={selectedId} onError={setErrorBar} />
             : <p style={{ color: 'var(--muted)' }}>Select or create a campaign.</p>}
         </main>
       </div>
