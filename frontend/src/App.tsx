@@ -28,7 +28,7 @@ export default function App() {
           onSelect={setSelectedId} onError={setErrorBar} />
         <main style={{ flex: 1, padding: 16 }}>
           {selectedId
-            ? <CampaignDetail id={selectedId} onError={setErrorBar}>
+            ? <CampaignDetail key={selectedId} id={selectedId} onError={setErrorBar}>
                 <EventStream campaignId={selectedId} />
               </CampaignDetail>
             : <p style={{ color: 'var(--muted)' }}>Select or create a campaign.</p>}

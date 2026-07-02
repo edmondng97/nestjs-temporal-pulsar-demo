@@ -7,9 +7,8 @@ function makeConsumer(overrides: {
   delivery?: object | null;
   epoch?: number;
   casResult?: number;
-  deliverOk?: boolean;
 } = {}) {
-  const { delivery, epoch = 1, casResult = 1, deliverOk = true } = overrides;
+  const { delivery, epoch = 1, casResult = 1 } = overrides;
 
   const mockClient = {} as any;
 
@@ -56,7 +55,7 @@ describe('CampaignDeliveryConsumer.handle()', () => {
   });
 
   it('emits SUCCESS on terminal success path', async () => {
-    const { consumer, mockEvents } = makeConsumer({ deliverOk: true });
+    const { consumer, mockEvents } = makeConsumer();
 
     // Patch deliverStub to always succeed
     jest.spyOn(consumer as any, 'deliverStub').mockResolvedValue(true);
