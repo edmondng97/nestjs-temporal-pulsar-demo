@@ -6,11 +6,13 @@ import { CampaignController } from './campaign.controller';
 import { CampaignDeliveryModule } from '../campaign-delivery/campaign-delivery.module';
 import { RedisService } from '../../libs/redis/redis.service';
 import { TemporalClientService } from '../../libs/temporal/temporal-client.service';
+import { CampaignEventsModule } from '../../libs/events/campaign-events.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Campaign.name, schema: CampaignSchema }]),
     CampaignDeliveryModule,
+    CampaignEventsModule,
   ],
   controllers: [CampaignController],
   providers: [CampaignService, RedisService, TemporalClientService],

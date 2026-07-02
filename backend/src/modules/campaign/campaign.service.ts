@@ -53,4 +53,8 @@ export class CampaignService {
   async listInProgress(): Promise<CampaignDocument[]> {
     return this.model.find({ status: CAMPAIGN_STATUS.IN_PROGRESS }).exec();
   }
+
+  async findAll(): Promise<CampaignDocument[]> {
+    return this.model.find().sort({ createdAt: -1 }).exec();
+  }
 }

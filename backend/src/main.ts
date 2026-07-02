@@ -6,6 +6,8 @@ import { CampaignDeliveryConsumer } from './libs/pulsar/campaign-delivery.consum
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
+  // Console dev server (Vite default port). Demo page is static and calls no API.
+  app.enableCors({ origin: ['http://localhost:5173'] });
   await app.listen(3000);
 
   // Start the Pulsar consume loop and the Temporal workers alongside the HTTP API.

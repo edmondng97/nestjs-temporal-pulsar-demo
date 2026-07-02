@@ -1,9 +1,11 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post, Sse, MessageEvent } from '@nestjs/common';
+import { Observable, map } from 'rxjs';
 import { Types } from 'mongoose';
 import { CampaignService } from './campaign.service';
 import { CampaignDeliveryService } from '../campaign-delivery/campaign-delivery.service';
 import { RedisService } from '../../libs/redis/redis.service';
 import { TemporalClientService } from '../../libs/temporal/temporal-client.service';
+import { CampaignEventsService } from '../../libs/events/campaign-events.service';
 import {
   EXECUTE_CAMPAIGN_WORKFLOW_TYPE,
   SCHEDULER_TASK_QUEUE,
@@ -19,6 +21,7 @@ export class CampaignController {
     private readonly deliveryService: CampaignDeliveryService,
     private readonly redis: RedisService,
     private readonly temporal: TemporalClientService,
+    private readonly events: CampaignEventsService,
   ) {}
 
   @Post()
@@ -66,6 +69,27 @@ export class CampaignController {
     return { resumed: true, epoch };
   }
 
+  // SSE stream of per-delivery consumer outcomes. Declared before ':id' routes
+  // so the literal path wins route matching.
+  @Sse('events')
+  sse(): Observable<MessageEvent> {
+    return this.events.stream().pipe(map((e) => ({ data: e })));
+  }
+
+  @Get()
+  async list() {
+    const docs = await this.campaignService.findAll();
+    return Promise.all(
+      docs.map(async (d) => ({
+        id: d._id.toString(),
+        status: d.status,
+        dispatchEpoch: d.dispatchEpoch,
+        paused: await this.redis.isPaused(d._id.toString()),
+        createdAt: (d as any).createdAt,
+      })),
+    );
+  }
+
   @Get(':id')
   async get(@Param('id') id: string) {
     const oid = new Types.ObjectId(id);
@@ -77,6 +101,6 @@ export class CampaignController {
       SUCCESS: await this.deliveryService.countByStatus(oid, DELIVERY_STATUS.SUCCESS),
       FAILED: await this.deliveryService.countByStatus(oid, DELIVERY_STATUS.FAILED),
     };
-    return { campaign, counts };
+    return { campaign, counts, paused: await this.redis.isPaused(id) };
   }
 }
