@@ -59,10 +59,54 @@
   <div class="code-card rise d4" style="margin-top:18px">// every message carries its generation
 { deliveryId, campaignId, epoch }</div>
 </section>
-    <section class="slide" data-title="Epoch Fence"><h1>Slide 5 placeholder</h1></section>
-    <section class="slide" data-title="Pause/Resume"><h1>Slide 6 placeholder</h1></section>
-    <section class="slide" data-title="Reliability"><h1>Slide 7 placeholder</h1></section>
-    <section class="slide" data-title="Run It"><h1>Slide 8 placeholder</h1></section>
+    <section class="slide" data-title="Epoch Fence">
+  <div class="kicker rise">04 — The Epoch Fence</div>
+  <h1 class="rise d1">One number makes<br><span class="gradient">resume safe.</span></h1>
+  <div class="fence rise d2">
+    <div class="msg stale">msg · epoch 1</div>
+    <div class="wall">campaign<br>epoch = 2</div>
+    <div class="msg fresh">msg · epoch 2</div>
+  </div>
+  <p class="sub rise d3">Resume bumps the campaign epoch atomically. In-flight messages from the old
+    round carry the old number — the consumer compares and <b style="color:var(--red)">ack-skips</b> them
+    without touching the row.</p>
+  <div class="code-card rise d4">if (msg.epoch &lt; currentEpoch) return; // stale → REJECTED, row untouched</div>
+</section>
+    <section class="slide" data-title="Pause/Resume">
+  <div class="kicker rise">05 — Pause &amp; Resume</div>
+  <h1 class="rise d1">Rewind, bump, <span class="gradient">relaunch.</span></h1>
+  <ol class="steps">
+    <li class="rise d1"><b>Pause</b> sets a Redis flag — the dispatcher stops claiming new batches.</li>
+    <li class="rise d2"><b>Resume</b> clears the flag, atomically bumps the epoch (fences old messages).</li>
+    <li class="rise d3"><b>Rewind</b> flips IN_PROGRESS rows back to PENDING — exactly the fenced ones.</li>
+    <li class="rise d4"><b>Relaunch</b> starts a fresh workflow (epoch-scoped id, no collisions) and drains to COMPLETED.</li>
+  </ol>
+</section>
+    <section class="slide" data-title="Reliability">
+  <div class="kicker rise">06 — Reliability</div>
+  <h1 class="rise d1">Assume everything <span class="gradient">crashes.</span></h1>
+  <div class="rise d2" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+    <div class="glow-card"><b style="color:var(--cyan)">CAS transitions</b><br>
+      <span class="sub" style="font-size:16px">Every status change is a compare-and-set; concurrent losers
+      ack-skip instead of double-sending.</span></div>
+    <div class="glow-card"><b style="color:var(--indigo)">Idempotent targeting</b><br>
+      <span class="sub" style="font-size:16px">Re-running the parent workflow never duplicates the
+      audience — rows are created once.</span></div>
+    <div class="glow-card"><b style="color:var(--pink)">Reconciliation cron</b><br>
+      <span class="sub" style="font-size:16px">A sweeper returns stuck rows to PENDING and completes
+      campaigns whose backlog has drained.</span></div>
+  </div>
+</section>
+    <section class="slide" data-title="Run It">
+  <div class="kicker rise">07 — Run It Yourself</div>
+  <h1 class="rise d1">Three commands to a <span class="gradient">live console.</span></h1>
+  <div class="code-card rise d2" style="margin-top:18px">git clone &lt;repo-url&gt; &amp;&amp; cd nestjs-temporal-pulsar-demo
+docker compose up -d
+cd backend &amp;&amp; npm i &amp;&amp; npm run build &amp;&amp; node dist/main.js
+cd frontend &amp;&amp; npm i &amp;&amp; npm run dev   # console on :5173</div>
+  <p class="sub rise d3" style="margin-top:18px">Create a campaign, dispatch it, pause mid-flight, resume —
+    and watch stale messages bounce off the fence in the live event stream.</p>
+</section>
   </main>
   <footer id="progress"></footer>
   <script src="deck.js"></script>

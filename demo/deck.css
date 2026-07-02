@@ -46,3 +46,23 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
 /* Slide 4: Dispatch Flow */
 .steps { margin: 24px 0 0; padding-left: 24px; display: grid; gap: 12px; font-size: 19px; }
 .steps b { color: var(--cyan); font-family: var(--mono); font-size: 16px; }
+
+/* Slide 5: Epoch Fence Animation */
+.fence { display: flex; align-items: center; gap: 28px; margin: 26px 0 10px; }
+.wall { border: 2px solid var(--indigo); border-radius: 12px; padding: 18px 22px; text-align: center;
+  font-family: var(--mono); box-shadow: 0 0 30px rgba(129,140,248,.4); }
+.msg { font-family: var(--mono); font-size: 15px; padding: 10px 14px; border-radius: 8px; }
+.msg.stale { border: 1px solid var(--red); color: var(--red); }
+.msg.fresh { border: 1px solid var(--green); color: var(--green); }
+.slide.entered .msg.stale { animation: bounce-off 1.6s .8s both; }
+.slide.entered .msg.fresh { animation: pass-through 1.6s 1.2s both; }
+@keyframes bounce-off {
+  0% { transform: translateX(0); opacity: 1; }
+  45% { transform: translateX(46px); }
+  70% { transform: translateX(-14px); }
+  100% { transform: translateX(-8px); opacity: .45; }
+}
+@keyframes pass-through {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-120px); opacity: .9; }
+}
