@@ -6,17 +6,15 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
-body { background: var(--bg); color: var(--text); overflow: hidden;
+html { margin: 0; scroll-snap-type: y mandatory; }
+body { margin: 0; background: var(--bg); color: var(--text);
   font: 18px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
 
-.slide { position: absolute; inset: 0 0 24px 0; padding: 8vh 10vw; display: none;
-  flex-direction: column; justify-content: center; }
-.slide.active { display: flex; }
-.slide.entered .rise { opacity: 1; transform: none; }
-.rise { opacity: 0; transform: translateY(18px); transition: opacity .6s, transform .6s; }
-.rise.d1 { transition-delay: .15s; } .rise.d2 { transition-delay: .3s; }
-.rise.d3 { transition-delay: .45s; } .rise.d4 { transition-delay: .6s; }
+/* Sections stack in normal flow; GSAP ScrollTrigger animates them on entry. */
+.slide { min-height: 100vh; padding: 8vh 10vw 12vh; display: flex;
+  flex-direction: column; justify-content: center; scroll-snap-align: start; }
+/* .rise elements are revealed by GSAP (gsap.from); no CSS transitions here so
+   the two systems never fight over the same properties. */
 
 .kicker { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--cyan); }
 h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-weight: 800; }
@@ -54,15 +52,4 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
 .msg { font-family: var(--mono); font-size: 15px; padding: 10px 14px; border-radius: 8px; }
 .msg.stale { border: 1px solid var(--red); color: var(--red); }
 .msg.fresh { border: 1px solid var(--green); color: var(--green); }
-.slide.entered .msg.stale { animation: bounce-off 1.6s .8s both; }
-.slide.entered .msg.fresh { animation: pass-through 1.6s 1.2s both; }
-@keyframes bounce-off {
-  0% { transform: translateX(0); opacity: 1; }
-  45% { transform: translateX(46px); }
-  70% { transform: translateX(-14px); }
-  100% { transform: translateX(-8px); opacity: .45; }
-}
-@keyframes pass-through {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-120px); opacity: .9; }
-}
+/* Fence choreography (stale bounce-off, fresh pass-through) lives in scroll.js. */
