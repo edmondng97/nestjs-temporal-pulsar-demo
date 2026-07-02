@@ -4,6 +4,7 @@ import { listCampaigns } from './api';
 import { usePolling } from './usePolling';
 import { CampaignList } from './CampaignList';
 import { CampaignDetail } from './CampaignDetail';
+import { EventStream } from './EventStream';
 
 export default function App() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -27,7 +28,9 @@ export default function App() {
           onSelect={setSelectedId} onError={setErrorBar} />
         <main style={{ flex: 1, padding: 16 }}>
           {selectedId
-            ? <CampaignDetail id={selectedId} onError={setErrorBar} />
+            ? <CampaignDetail id={selectedId} onError={setErrorBar}>
+                <EventStream campaignId={selectedId} />
+              </CampaignDetail>
             : <p style={{ color: 'var(--muted)' }}>Select or create a campaign.</p>}
         </main>
       </div>
