@@ -8,10 +8,57 @@
 </head>
 <body>
   <main id="deck">
-    <section class="slide" data-title="Cover"><h1>Slide 1 placeholder</h1></section>
-    <section class="slide" data-title="Problem"><h1>Slide 2 placeholder</h1></section>
-    <section class="slide" data-title="Architecture"><h1>Slide 3 placeholder</h1></section>
-    <section class="slide" data-title="Dispatch"><h1>Slide 4 placeholder</h1></section>
+    <section class="slide" data-title="Cover">
+  <div class="kicker rise">Campaign Dispatch Engine</div>
+  <h1 class="rise d1">Pause. Resume.<br><span class="gradient">Never dispatch twice.</span></h1>
+  <p class="sub rise d2">A campaign delivery pipeline that survives pause, resume, retries and
+    races — built on NestJS, Temporal and Pulsar.</p>
+  <div class="rise d3" style="display:flex;gap:12px;margin-top:24px">
+    <span class="glow-card" style="padding:8px 16px">NestJS</span>
+    <span class="glow-card" style="padding:8px 16px">Temporal</span>
+    <span class="glow-card" style="padding:8px 16px">Pulsar</span>
+    <span class="glow-card" style="padding:8px 16px">MongoDB · Redis</span>
+  </div>
+</section>
+    <section class="slide" data-title="Problem">
+  <div class="kicker rise">01 — The Problem</div>
+  <h1 class="rise d1">Pausing a campaign of<br><span class="gradient">a million messages</span> is hard.</h1>
+  <div class="rise d2" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px">
+    <div class="glow-card"><b style="color:var(--red)">Duplicates</b><br>
+      <span class="sub" style="font-size:16px">Resume re-sends messages that were already in flight.</span></div>
+    <div class="glow-card"><b style="color:var(--red)">Races</b><br>
+      <span class="sub" style="font-size:16px">Consumers and the pause signal fight over the same rows.</span></div>
+    <div class="glow-card"><b style="color:var(--red)">Orphans</b><br>
+      <span class="sub" style="font-size:16px">Rows stuck IN_PROGRESS forever when a worker dies mid-send.</span></div>
+  </div>
+</section>
+    <section class="slide" data-title="Architecture">
+  <div class="kicker rise">02 — Architecture</div>
+  <h1 class="rise d1">Five moving parts, <span class="gradient">one truth source.</span></h1>
+  <div class="arch rise d2">
+    <div class="node" style="--c:var(--cyan)">NestJS API<small>REST + SSE</small></div>
+    <div class="arrow">→</div>
+    <div class="node" style="--c:var(--indigo)">Temporal<small>workflows · activities</small></div>
+    <div class="arrow">→</div>
+    <div class="node" style="--c:var(--pink)">Pulsar<small>shared subscription</small></div>
+    <div class="arrow">→</div>
+    <div class="node" style="--c:var(--green)">Consumer<small>epoch fence + CAS</small></div>
+  </div>
+  <p class="sub rise d3" style="margin-top:20px">MongoDB rows are the source of truth; Redis holds the
+    pause flag; every message carries its dispatch epoch.</p>
+</section>
+    <section class="slide" data-title="Dispatch">
+  <div class="kicker rise">03 — Dispatch Flow</div>
+  <h1 class="rise d1">From one API call<br>to <span class="gradient">a drained backlog.</span></h1>
+  <ol class="steps">
+    <li class="rise d1"><b>POST /campaigns/:id/dispatch</b> starts the parent Temporal workflow.</li>
+    <li class="rise d2"><b>Targeting activity</b> materialises PENDING delivery rows (idempotent).</li>
+    <li class="rise d3"><b>Dispatcher workflow</b> claims batches PENDING → IN_PROGRESS, publishes to Pulsar.</li>
+    <li class="rise d4"><b>Consumers</b> re-read the row, fence the epoch, CAS to SENDING, then finalize.</li>
+  </ol>
+  <div class="code-card rise d4" style="margin-top:18px">// every message carries its generation
+{ deliveryId, campaignId, epoch }</div>
+</section>
     <section class="slide" data-title="Epoch Fence"><h1>Slide 5 placeholder</h1></section>
     <section class="slide" data-title="Pause/Resume"><h1>Slide 6 placeholder</h1></section>
     <section class="slide" data-title="Reliability"><h1>Slide 7 placeholder</h1></section>

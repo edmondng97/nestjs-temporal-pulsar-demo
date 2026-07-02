@@ -35,3 +35,14 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
   display: flex; gap: 6px; padding: 9px 10vw; }
 .seg { flex: 1; border-radius: 3px; background: rgba(255,255,255,.12); transition: background .3s; }
 .seg.done { background: linear-gradient(90deg, var(--indigo), var(--cyan)); }
+
+/* Slide 3: Architecture */
+.arch { display: flex; align-items: center; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+.node { border: 1px solid var(--c); border-radius: 12px; padding: 16px 20px; min-width: 150px;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--c) 30%, transparent); }
+.node small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
+.arrow { color: var(--muted); font-size: 24px; }
+
+/* Slide 4: Dispatch Flow */
+.steps { margin: 24px 0 0; padding-left: 24px; display: grid; gap: 12px; font-size: 19px; }
+.steps b { color: var(--cyan); font-family: var(--mono); font-size: 16px; }
