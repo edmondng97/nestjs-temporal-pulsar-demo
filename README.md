@@ -2,17 +2,17 @@
 
 > **Language / 语言:** [English](#english) · [简体中文](#简体中文)
 
+---
+
+<a name="english"></a>
+## English
+
 A technical architecture demo. The **campaign dispatch core** is extracted from a
 production service with all business logic stripped out (the delivery action is an
 empty stub). It focuses purely on the engineering: **Temporal workflow orchestration,
 Pulsar message dispatch, CAS-based idempotent state machine, epoch fencing against
 stale messages, pause/resume rewind, reconciliation safety net, hexagonal port
 layering, and code discipline.**
-
----
-
-<a name="english"></a>
-## English
 
 ### Repository layout
 
