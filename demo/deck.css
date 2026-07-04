@@ -6,13 +6,30 @@
   --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 * { box-sizing: border-box; }
-html { margin: 0; scroll-snap-type: y mandatory; }
+/* No scroll-snap: pinned ScrollTrigger scenes need free scrolling. */
+html { margin: 0; }
 body { margin: 0; background: var(--bg); color: var(--text);
   font: 18px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
 
+/* Fixed ambience layers behind all slides. */
+.bg-grid { position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 40%, transparent 100%); }
+.beam { position: fixed; top: 0; left: 50%; width: 2px; height: 100vh; z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(34,211,238,.35) 15%,
+    rgba(34,211,238,.10) 85%, transparent); }
+
 /* Sections stack in normal flow; GSAP ScrollTrigger animates them on entry. */
 .slide { min-height: 100vh; padding: 8vh 10vw 12vh; display: flex;
-  flex-direction: column; justify-content: center; scroll-snap-align: start; }
+  flex-direction: column; justify-content: center; }
+/* Word spans created by scroll.js for the hero 3D entrance. */
+.hero-word { display: inline-block; will-change: transform; }
+.slide h1 { perspective: 600px; }
 /* .rise elements are revealed by GSAP (gsap.from); no CSS transitions here so
    the two systems never fight over the same properties. */
 
@@ -24,7 +41,9 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
 
 .glow-card { background: rgba(255,255,255,.05); border: 1px solid rgba(129,140,248,.35);
   border-radius: 12px; padding: 18px 22px;
-  box-shadow: 0 0 24px rgba(99,102,241,.15); }
+  box-shadow: 0 0 24px rgba(99,102,241,.15);
+  transition: border-color .3s, box-shadow .3s; }
+.glow-card:hover { border-color: rgba(34,211,238,.5); box-shadow: 0 0 32px rgba(34,211,238,.12); }
 .code-card { background: #0d1220; border: 1px solid #1f2937; border-radius: 10px;
   padding: 14px 18px; font-family: var(--mono); font-size: 14px; line-height: 1.5;
   overflow-x: auto; white-space: pre; color: #c9d1d9; }
@@ -37,7 +56,9 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
 /* Slide 3: Architecture */
 .arch { display: flex; align-items: center; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
 .node { border: 1px solid var(--c); border-radius: 12px; padding: 16px 20px; min-width: 150px;
-  box-shadow: 0 0 22px color-mix(in srgb, var(--c) 30%, transparent); }
+  box-shadow: 0 0 22px color-mix(in srgb, var(--c) 30%, transparent);
+  transition: box-shadow .3s; }
+.node.lit { box-shadow: 0 0 36px color-mix(in srgb, var(--c) 55%, transparent); }
 .node small { display: block; color: var(--muted); font-size: 13px; margin-top: 4px; }
 .arrow { color: var(--muted); font-size: 24px; }
 
