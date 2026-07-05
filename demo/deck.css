@@ -8,6 +8,9 @@
 * { box-sizing: border-box; }
 /* No scroll-snap: pinned ScrollTrigger scenes need free scrolling. */
 html { margin: 0; }
+/* GSAP entrance tweens shift elements horizontally mid-flight; without this,
+   mobile browsers widen the layout viewport to fit the transient overflow. */
+html, body { overflow-x: hidden; }
 body { margin: 0; background: var(--bg); color: var(--text);
   font: 18px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
 
@@ -74,3 +77,16 @@ h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.1; margin: .3em 0; font-w
 .msg.stale { border: 1px solid var(--red); color: var(--red); }
 .msg.fresh { border: 1px solid var(--green); color: var(--green); }
 /* Fence choreography (stale bounce-off, fresh pass-through) lives in scroll.js. */
+
+/* Mobile: wrap flex rows and collapse 3-col grids so nothing forces a wide viewport. */
+@media (max-width: 640px) {
+  .slide { padding: 8vh 6vw 12vh; }
+  /* GSAP re-serializes inline styles with spaces, so match both forms. */
+  .slide div[style*="display:flex"], .slide div[style*="display: flex"] { flex-wrap: wrap; }
+  .slide div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  .fence { flex-wrap: wrap; gap: 16px; }
+  .arch { gap: 10px; }
+  .node { min-width: 120px; padding: 12px 14px; }
+  .steps { font-size: 17px; }
+  #progress { padding: 9px 16px; }
+}
